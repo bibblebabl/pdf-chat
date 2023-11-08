@@ -9,7 +9,6 @@ from threading import Thread
 
 load_dotenv()
 
-
 class StreamingHandler(BaseCallbackHandler):
     def __init__(self, queue):
         self.queue = queue
@@ -23,13 +22,11 @@ class StreamingHandler(BaseCallbackHandler):
     def on_llm_error(self, error, **kwargs):
         self.queue.put(None)
 
-
 chat = ChatOpenAI(streaming=True)
 
 prompt = ChatPromptTemplate.from_messages([
     ("human", "{content}")
 ])
-
 
 class StreamableChain:
     def stream(self, input):
@@ -40,17 +37,15 @@ class StreamableChain:
             self(input, callbacks=[handler])
 
         Thread(target=task).start()
-
+        
         while True:
             token = queue.get()
             if token is None:
                 break
             yield token
 
-
 class StreamingChain(StreamableChain, LLMChain):
     pass
-
 
 chain = StreamingChain(llm=chat, prompt=prompt)
 
