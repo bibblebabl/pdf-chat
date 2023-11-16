@@ -1,20 +1,36 @@
-from app.chat.redis import redisClient
+from app.chat.redis import client
 
+def random_component_by_score(component_type, component_map):
+    # Make sure component_type is 'llm', 'retriever', or 'memory'
+    if component_type not in ["llm", "retriever", "memory"]:
+        raise ValueError("Invalid component_type")
+
+    # From redis, get the hash containing the sum total scores for the given commponent_type
+    values = client.hgetall(f"{component_type}_score_values")
+    # From redis, get the hash containing the number of times each component has been voted on
+    counts = client.hgetall(f"{component_type}_score_counts")
+
+    print(values, counts)
+    # Get all the valid component names from the component map
+
+    # Loop over those valid names and use them to calculate the average score for each
+    # Add average score to a dictionary
+
+    # Do a weighted random selection
 
 def score_conversation(
     conversation_id: str, score: float, llm: str, retriever: str, memory: str
 ) -> None:
     score = min(max(score, 0), 1)
 
-    redisClient.hincrby("llm_score_values", llm, score)
-    redisClient.hincrby("llm_score_counts", llm, 1)
+    client.hincrby("llm_score_values", llm, score)
+    client.hincrby("llm_score_counts", llm, 1)
 
-    redisClient.hincrby("retriever_score_values", retriever, score)
-    redisClient.hincrby("retriever_score_counts", retriever, 1)
+    client.hincrby("retriever_score_values", retriever, score)
+    client.hincrby("retriever_score_counts", retriever, 1)
 
-    redisClient.hincrby("memory_score_values", memory, score)
-    redisClient.hincrby("memory_score_counts", memory, 1)
-
+    client.hincrby("memory_score_values", memory, score)
+    client.hincrby("memory_score_counts", memory, 1)
 
 def get_scores():
     """
