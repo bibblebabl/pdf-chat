@@ -1,18 +1,20 @@
-from app.chat.redis import client
+from app.chat.redis import redisClient
+
 
 def score_conversation(
     conversation_id: str, score: float, llm: str, retriever: str, memory: str
 ) -> None:
     score = min(max(score, 0), 1)
 
-    client.hincrby("llm_score_values", llm, score)
-    client.hincrby("llm_score_counts", llm, 1)
+    redisClient.hincrby("llm_score_values", llm, score)
+    redisClient.hincrby("llm_score_counts", llm, 1)
 
-    client.hincrby("retriever_score_values", retriever, score)
-    client.hincrby("retriever_score_counts", retriever, 1)
+    redisClient.hincrby("retriever_score_values", retriever, score)
+    redisClient.hincrby("retriever_score_counts", retriever, 1)
 
-    client.hincrby("memory_score_values", memory, score)
-    client.hincrby("memory_score_counts", memory, 1)
+    redisClient.hincrby("memory_score_values", memory, score)
+    redisClient.hincrby("memory_score_counts", memory, 1)
+
 
 def get_scores():
     """
